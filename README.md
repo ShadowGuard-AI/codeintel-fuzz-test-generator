@@ -1,3 +1,5 @@
+![Banner](banner.png)
+
 # codeintel-Fuzz-Test-Generator
 Generates basic fuzz tests based on code structure and function signatures, focusing on boundary conditions and common error patterns. - Focused on Tools for static code analysis, vulnerability scanning, and code quality assurance
 

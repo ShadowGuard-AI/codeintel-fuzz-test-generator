@@ -111,7 +111,10 @@ def generate_fuzz_tests(module_path, num_tests=DEFAULT_NUM_TESTS, string_length=
 
         test_cases = []
         for name, obj in inspect.getmembers(module):
-            if inspect.isfunction(obj):
+            # getmembers also returns functions the module merely imported.
+            # Fuzzing those tests someone else's code and buries the target
+            # module's own functions, so keep only what is defined here.
+            if inspect.isfunction(obj) and obj.__module__ == module.__name__:
                 try:
                     sig = inspect.signature(obj)
                     params = sig.parameters
@@ -120,6 +123,11 @@ def generate_fuzz_tests(module_path, num_tests=DEFAULT_NUM_TESTS, string_length=
                         kwargs = {}
                         for param_name, param in params.items():
                             param_type = param.annotation if param.annotation != inspect.Parameter.empty else str  # Default to str if no annotation
+                            # A quoted annotation arrives as the string "int", not
+                            # the type, and generate_fuzz_input can only switch on
+                            # the type itself, so resolve the common names first.
+                            if isinstance(param_type, str):
+                                param_type = {"int": int, "float": float, "str": str, "bool": bool}.get(param_type, str)
 
                             # Handle variable positional arguments (*args)
                             if param.kind == inspect.Parameter.VAR_POSITIONAL:

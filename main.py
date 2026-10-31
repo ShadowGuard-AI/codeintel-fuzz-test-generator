@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import inspect
+import ast
 import logging
 import os
 import sys
@@ -90,93 +90,104 @@ def generate_fuzz_input(param_type, string_length=DEFAULT_STRING_LENGTH, int_ran
         return None
 
 
+def _annotation_type(node):
+    """Maps an annotation node, rendered from source, to a type."""
+    if node is None:
+        return str
+    try:
+        name = ast.unparse(node).strip()
+    except Exception:
+        return str
+    return {"int": int, "float": float, "str": str, "bool": bool}.get(name, str)
+
+
 def generate_fuzz_tests(module_path, num_tests=DEFAULT_NUM_TESTS, string_length=DEFAULT_STRING_LENGTH, int_range=DEFAULT_INT_RANGE):
     """
     Generates fuzz tests for functions in a given module.
+
+    The target module is read and parsed with ast only. It is never
+    imported or executed, so its top level code does not run.
+
+    Returns a list of test case strings, or None when the target
+    cannot be read or parsed.
     """
     try:
-        # Dynamically import the module
-        module_dir, module_file = os.path.split(module_path)
-        module_name, module_ext = os.path.splitext(module_file)
+        with open(module_path, "r") as f:
+            source = f.read()
+    except OSError as e:
+        logging.error(f"Failed to read module {module_path}: {e}")
+        return None
+    try:
+        tree = ast.parse(source, filename=module_path)
+    except SyntaxError as e:
+        logging.error(f"Failed to parse module {module_path}: {e}")
+        return None
 
-        if module_dir not in sys.path:
-            sys.path.append(module_dir)
+    # Defaults are rendered from the source where they are written
+    # with ast.unparse; generation itself fills every parameter with
+    # a fuzz value, matching the previous generator's output shape.
+    functions = [node for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
 
+    test_cases = []
+    for func in functions:
         try:
-            module = __import__(module_name)
-        except ImportError as e:
-            logging.error(f"Failed to import module {module_name}: {e}")
-            return []
+            positional = list(func.args.posonlyargs) + list(func.args.args)
+            defaults = [None] * (len(positional) - len(func.args.defaults)) + list(func.args.defaults)
+            param_specs = []
+            for arg_node, default_node in zip(positional, defaults):
+                default_text = ast.unparse(default_node) if default_node is not None else None
+                param_specs.append((arg_node.arg, _annotation_type(arg_node.annotation), "pos", default_text))
+            if func.args.vararg is not None:
+                param_specs.append((func.args.vararg.arg, int, "varpos", None))
+            for arg_node, default_node in zip(func.args.kwonlyargs, func.args.kw_defaults):
+                default_text = ast.unparse(default_node) if default_node is not None else None
+                param_specs.append((arg_node.arg, _annotation_type(arg_node.annotation), "kwonly", default_text))
+            if func.args.kwarg is not None:
+                param_specs.append((func.args.kwarg.arg, int, "varkw", None))
 
+            for i in range(num_tests):
+                args = []
+                kwargs = {}
+                for param_name, param_type, kind, _default_text in param_specs:
+                    if kind == "varpos":
+                        args.extend([generate_fuzz_input(int, string_length, int_range) for _ in range(random.randint(0, 3))])
+                        continue
+                    if kind == "varkw":
+                        kwargs.update({
+                            ''.join(random.choice(string.ascii_lowercase) for _ in range(5)): generate_fuzz_input(int, string_length, int_range)
+                            for _ in range(random.randint(0, 3))
+                        })
+                        continue
+                    arg = generate_fuzz_input(param_type, string_length, int_range)
+                    if kind == "kwonly":
+                        kwargs[param_name] = arg
+                    else:
+                        args.append(arg)
 
-        test_cases = []
-        for name, obj in inspect.getmembers(module):
-            # getmembers also returns functions the module merely imported.
-            # Fuzzing those tests someone else's code and buries the target
-            # module's own functions, so keep only what is defined here.
-            if inspect.isfunction(obj) and obj.__module__ == module.__name__:
-                try:
-                    sig = inspect.signature(obj)
-                    params = sig.parameters
-                    for i in range(num_tests):
-                        args = []
-                        kwargs = {}
-                        for param_name, param in params.items():
-                            param_type = param.annotation if param.annotation != inspect.Parameter.empty else str  # Default to str if no annotation
-                            # A quoted annotation arrives as the string "int", not
-                            # the type, and generate_fuzz_input can only switch on
-                            # the type itself, so resolve the common names first.
-                            if isinstance(param_type, str):
-                                param_type = {"int": int, "float": float, "str": str, "bool": bool}.get(param_type, str)
+                args_str = ", ".join(repr(arg) for arg in args)
+                kwargs_str = ", ".join(f"{k}={repr(v)}" for k, v in kwargs.items())
+                if args_str and kwargs_str:
+                    call_str = f"{func.name}({args_str}, {kwargs_str})"
+                elif args_str:
+                    call_str = f"{func.name}({args_str})"
+                elif kwargs_str:
+                    call_str = f"{func.name}({kwargs_str})"
+                else:
+                    call_str = f"{func.name}()"
 
-                            # Handle variable positional arguments (*args)
-                            if param.kind == inspect.Parameter.VAR_POSITIONAL:
-                                args.extend([generate_fuzz_input(int, string_length, int_range) for _ in range(random.randint(0, 3))]) # fuzz *args
-                                continue
-                            # Handle variable keyword arguments (**kwargs)
-                            elif param.kind == inspect.Parameter.VAR_KEYWORD:
-                                #Create a dict of random inputs for kwargs. Limiting to 3 for clarity.
-                                kwargs.update({
-                                    ''.join(random.choice(string.ascii_lowercase) for _ in range(5)): generate_fuzz_input(int, string_length, int_range)
-                                    for _ in range(random.randint(0, 3))
-                                })
-                                continue
-                            else:
-                                arg = generate_fuzz_input(param_type, string_length, int_range)
+                test_case = f"# Test case {i+1} for function: {func.name}\n"
+                test_case += f"# Call: {call_str}\n"
+                test_case += f"try:\n"
+                test_case += f"    result = {call_str}\n"
+                test_case += f"    print(f'Function {func.name} executed successfully. Result: {{result}}')\n"
+                test_case += f"except Exception as e:\n"
+                test_case += f"    print(f'Function {func.name} raised an exception: {{e}}')\n\n"
+                test_cases.append(test_case)
+        except Exception as e:
+            logging.error(f"Error generating test case for function {func.name}: {e}")
 
-                            if param.kind == inspect.Parameter.KEYWORD_ONLY:
-                                kwargs[param_name] = arg
-                            else:
-                                args.append(arg)
+    return test_cases
 
-                        # Construct the test case string
-                        args_str = ", ".join(repr(arg) for arg in args)
-                        kwargs_str = ", ".join(f"{k}={repr(v)}" for k, v in kwargs.items())
-                        if args_str and kwargs_str:
-                            call_str = f"{obj.__name__}({args_str}, {kwargs_str})"
-                        elif args_str:
-                            call_str = f"{obj.__name__}({args_str})"
-                        elif kwargs_str:
-                            call_str = f"{obj.__name__}({kwargs_str})"
-                        else:
-                            call_str = f"{obj.__name__}()"
-
-                        test_case = f"# Test case {i+1} for function: {obj.__name__}\n"
-                        test_case += f"# Call: {call_str}\n"
-                        test_case += f"try:\n"
-                        test_case += f"    result = {call_str}\n"
-                        test_case += f"    print(f'Function {obj.__name__} executed successfully. Result: {{result}}')\n"
-                        test_case += f"except Exception as e:\n"
-                        test_case += f"    print(f'Function {obj.__name__} raised an exception: {{e}}')\n\n"
-                        test_cases.append(test_case)
-                except Exception as e:
-                    logging.error(f"Error generating test case for function {name}: {e}")
-
-        return test_cases
-
-    except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
-        return []
 
 def main():
     """
@@ -209,6 +220,14 @@ def main():
         args.string_length,
         (args.int_min, args.int_max)
     )
+
+    if tests is None:
+        print("Failed to generate fuzz tests: the target module could not be read or parsed.")
+        sys.exit(1)
+
+    if not tests:
+        print("Failed to generate fuzz tests: no functions defined in the target module.")
+        sys.exit(1)
 
     if args.output_file:
         try:

@@ -3,6 +3,8 @@
 # codeintel-Fuzz-Test-Generator
 Generates basic fuzz tests based on code structure and function signatures, focusing on boundary conditions and common error patterns. - Focused on Tools for static code analysis, vulnerability scanning, and code quality assurance
 
+The target module is read and parsed from its syntax tree only. It is never imported or executed, so its top level code does not run during generation. A run exits 1 when the target cannot be read or parsed, and exits 1 when a readable module defines no functions of its own. A failed run writes no output file.
+
 ## Install
 `git clone https://github.com/ShadowStrikeHQ/codeintel-fuzz-test-generator`
 

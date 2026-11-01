@@ -73,6 +73,9 @@ def generate_fuzz_input(param_type, string_length=DEFAULT_STRING_LENGTH, int_ran
     """
     try:
         if param_type is int:
+            # I never seed the random module, so two runs over the same
+            # module produce different tests. A failing generated case has
+            # to be saved from its run, because rerunning will not make it.
             return random.randint(int_range[0], int_range[1])
         elif param_type is float:
             return random.uniform(int_range[0], int_range[1])
@@ -98,6 +101,10 @@ def _annotation_type(node):
         name = ast.unparse(node).strip()
     except Exception:
         return str
+    # I fall back to str for any annotation I do not know, including
+    # list and dict. The generated call then passes a string where
+    # the function may expect a container, which is a real fuzz
+    # case, but it is not the type the author annotated.
     return {"int": int, "float": float, "str": str, "bool": bool}.get(name, str)
 
 
@@ -180,6 +187,9 @@ def generate_fuzz_tests(module_path, num_tests=DEFAULT_NUM_TESTS, string_length=
                 test_case += f"try:\n"
                 test_case += f"    result = {call_str}\n"
                 test_case += f"    print(f'Function {func.name} executed successfully. Result: {{result}}')\n"
+                # The generated test catches its own exceptions and only prints
+                # them. Whoever runs the output has to read the printout to know
+                # a case failed; the exit code of the generated file stays 0.
                 test_case += f"except Exception as e:\n"
                 test_case += f"    print(f'Function {func.name} raised an exception: {{e}}')\n\n"
                 test_cases.append(test_case)

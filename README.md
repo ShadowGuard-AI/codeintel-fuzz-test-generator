@@ -1,12 +1,10 @@
-![Darkroom with no lettering: one stereoscope near and large with its paired card seated, a light table glowing with aligned pairs, a ruler at rest, squared sleeves, further stereoscopes in diminishing scale, and pinned flight strips climbing the wall](intro-banner.png)
+![The tensile machine's jaws close up with the yarn sample stretched between them and its thread beginning to fray, the technician's hand at the frame edge and the bobbin row soft behind](intro-banner.png)
 
 # codeintel-Fuzz-Test-Generator
 
 Specimen label treatment: the title is set in Be Vietnam Pro on a lab white plate ruled as a specimen label, with the single stereoscope drawn once as a header plate beneath the banner, and the remaining headings stay typographic, as specimen labels in Cabin.
 
-![One stereoscope in profile on a plain ground line: hood in lab white, reagent violet shadow under the holder, copper stand and card clips, slate base, and the name hand lettered on a specimen label tag](logo.png)
-
-![The cartography darkroom at work: a light table at the centre bearing aligned paired aerial photographs, stereoscopes along the bench, sleeves squared at the edge, a ruler across one pair, pinned flight strips on the far wall, one warm lamp in the sorter corner, and the title once on the light table fascia](banner.png)
+![One wooden bobbin wound with cream yarn resting on its side on a weathered bench, loose thread trailing from it and mill brick soft behind](logo.png)
 
 ![Darkroom in three depths: a paired photograph slides a little into alignment on the light table, a stereoscope tips a little toward true and rests, and the light table glow breathes faintly at its edge, while the pinned flight strips stay still](scene.svg)
 

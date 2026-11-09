@@ -3,23 +3,94 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>codeintel-fuzz-test-generator: Cartography Darkroom of the Aerial Photos</title>
-<meta name="description" content="A flight strip laid out for inspection: paired aerial photographs on a light table, a stereoscope at the bench, and test cases written from signatures alone.">
-<style>@font-face{font-family:'Be Vietnam Pro';src:url('fonts/Be Vietnam ProF') format('truetype');}@font-face{font-family:'Cabin.ttf';src:url('fonts/Cabin.ttf') format('truetype');}:root{--a:#3e4a57;--b:#b87333;--c:#f4f1e8;--ink:#262c34}*{box-sizing:border-box}body{margin:0;background:var(--a);color:var(--ink);font-family:'Cabin.ttf',sans-serif;line-height:1.65}h1,h2,h3{font-family:'Be Vietnam Pro',sans-serif;color:var(--b)}.heroimg{width:100%;height:52vh;object-fit:cover;display:block}.in,main,footer{max-width:1000px;margin:0 auto;padding:1rem 5vw 2rem}.logo{width:230px}.btn{display:inline-block;text-decoration:none;font-family:'Be Vietnam Pro',sans-serif;color:var(--ink);background:var(--c);border:2px solid var(--b);padding:.7rem 1.2rem;margin:.3rem;transition:background .15s,transform .15s}.btn:hover{filter:brightness(1.18)}.btn:active{transform:translateY(3px)}.btn:focus-visible{outline:3px solid var(--b);outline-offset:4px}nav{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0}main a{color:var(--b)}main a::before{content:'\2726  ';font-size:.85em}.panel{background:var(--c);padding:.4rem 1.5rem 1.4rem;margin:1.6rem 0}.callout{border-left:8px solid var(--b);padding:.2rem 1.2rem 1rem;margin:1.2rem 0;background:rgba(0,0,0,.08)}pre{background:#22303c;color:#f5edd6;padding:1rem;overflow-x:auto}table{border-collapse:collapse}td,th{border:1px solid var(--b);padding:.35rem .8rem;text-align:left}.div{height:10px;border-top:2px solid var(--b);margin:1.4rem 0}header .in p,header h1{color:var(--c)}footer,footer p{color:var(--c)}</style>
+<title>codeintel-fuzz-test-generator: The Tensile Bench</title>
+<style>
+@font-face { font-family: "Kelly Slab"; src: url("fonts/KellySlab-400.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Telex"; src: url("fonts/Telex-400.woff2") format("woff2"); font-weight: 400; }
+:root {
+  --paper: #f7f1e5; --cream: #ece1cb; --ink: #2b2320; --soft: #6d5c4c;
+  --accent: #9e2b25; --deep: #5d4a36; --line: #d9c9a8; --card: #ffffff;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--cream); color: var(--ink); font-family: "Telex", sans-serif; line-height: 1.55; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 64px; }
+header.hero { text-align: center; padding: 52px 0 8px; }
+img.hero-logo { width: min(430px, 82vw); border-radius: 10px; box-shadow: 0 10px 34px rgba(60,40,20,.22); }
+h1, h2 { font-family: "Kelly Slab", sans-serif; line-height: 1.15; font-weight: 400; }
+h1 { font-size: clamp(26px, 5vw, 44px); margin: 26px 0 6px; }
+.tagline { color: var(--soft); font-size: 19px; margin: 0 auto; max-width: 680px; }
+.btns { margin: 22px 0 6px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+a.btn { font-family: "Kelly Slab", sans-serif; text-decoration: none; padding: 11px 22px; border-radius: 999px; border: 2px solid var(--accent); color: var(--accent); background: transparent; }
+a.btn.solid { background: var(--deep); border-color: var(--deep); color: #fff; }
+figure { margin: 30px 0; }
+figure img { width: 100%; border-radius: 10px; display: block; box-shadow: 0 8px 28px rgba(60,40,20,.22); }
+figcaption { color: var(--soft); font-size: 15px; text-align: center; margin-top: 9px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 34px 0; }
+.fact { background: var(--card); border: 1px solid var(--line); border-top: 5px solid var(--accent); border-radius: 8px; padding: 14px 16px; }
+.fact b { display: block; font-family: "Kelly Slab", sans-serif; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+section { margin: 38px 0; }
+h2 { font-size: 27px; margin: 0 0 12px; border-bottom: 2px solid var(--line); padding-bottom: 7px; }
+code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+pre { background: #2b2118; color: #f3ecdd; padding: 15px 18px; border-radius: 8px; overflow-x: auto; font-size: 14.5px; }
+table { border-collapse: collapse; width: 100%; background: var(--card); }
+th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: left; vertical-align: top; }
+th { font-family: "Kelly Slab", sans-serif; background: var(--cream); }
+.hold { background: #fdf3ec; border: 1px solid #e8c9b8; border-left: 6px solid var(--accent); border-radius: 8px; padding: 16px 20px; }
+.hold h2 { border: none; padding: 0; }
+.hold ul { margin: 8px 0 4px; padding-left: 20px; }
+footer { margin-top: 52px; border-top: 2px solid var(--line); padding-top: 16px; color: var(--soft); font-size: 14.5px; text-align: center; }
+</style>
 </head>
 <body>
+<div class="wrap">
 <header class="hero">
-<img class="heroimg" src="assets/intro-banner.png" alt="Darkroom with no lettering: one stereoscope near and large with its paired card seated, a light table glowing with aligned pairs, a ruler at rest, squared sleeves, and pinned flight strips on the wall">
-<div class="in">
-<img class="logo" src="assets/logo.png" alt="One stereoscope in profile: hood in lab white, shadow in reagent violet, copper stand and clips, slate base, and the name on a specimen label tag below">
-<h1>codeintel-fuzz-test-generator</h1>
-<p>A flight strip laid out for inspection: paired aerial photographs on a light table, a stereoscope at the bench, and test cases written from signatures alone.</p>
-<nav><a class="btn" href="#s0">Generate Ten Tests per Function</a><a class="btn" href="#s1">Set String Length and Integer Bounds</a><a class="btn" href="#s2">Save the Tests to a File</a><a class="btn" href="#s3">Print the Tests Instead</a></nav>
-</div>
+  <img class="hero-logo" src="assets/logo.png" alt="One wooden bobbin wound with cream yarn resting on its side on a weathered bench, loose thread trailing from it and mill brick soft behind">
+  <h1>codeintel-fuzz-test-generator</h1>
+  <p class="tagline">The Tensile Bench. A fuzz test generator that reads one Python module and writes generated test cases for its top level functions, each one fed value after value drawn at random.</p>
+  <div class="btns">
+    <a class="btn solid" href="https://github.com/ShadowGuard-AI/codeintel-fuzz-test-generator">The repository</a>
+    <a class="btn" href="https://github.com/ShadowGuard-AI/codeintel-fuzz-test-generator/blob/main/main.py">main.py</a>
+  </div>
 </header>
-<main>
-<section class="panel" id="s0"><h2>What the Syntax Tree Gives Up</h2><p>The target module is read and parsed from its syntax tree only. It is never imported or executed, so its top level code does not run during generation. A test set is written for each function the module itself defines at top level. The default count is ten tests per function. The values supplied are bounded random strings and integers, together with floats, booleans and None where the annotation asks for them. Where an annotation is absent the value defaults to a string. Where an annotation names a kind the generator does not know, including list and dict, the value likewise falls back to a string, which is a genuine fuzz case and also, plainly, not the type the author wrote.</p></section><div class="div"></div><section class="panel" id="s1"><h2>The Measures on Their Sleeves</h2><table><tr><th>Setting</th><th>Default or behaviour</th></tr><tr><td><code>module_path</code> (positional)</td><td>Path to the Python module containing the functions to be tested. Required. The README omits it altogether.</td></tr><tr><td><code>num_tests</code></td><td>10 by default</td></tr><tr><td><code>string_length</code></td><td>10 by default</td></tr><tr><td><code>int_min</code> and <code>int_max</code></td><td>Minus 100 and 100</td></tr><tr><td><code>output_file</code></td><td>When it is not provided, the generated tests are printed to standard output rather than saved.</td></tr></table><div class="callout"><h3>Placeholder Usage Line</h3><p>The printed usage line from the README reads <code>./codeintel-fuzz-test-generator [params]</code>. It is reproduced exactly and flagged as a placeholder that names neither the positional path nor any of the measures it pretends to summarise.</p></div></section><div class="div"></div><section class="panel" id="s2"><h2>The Positional Path the README Forgot</h2><p>The run begins with the positional module path, in the form <code>python3 main.py MODULE_PATH</code>. Without that path no run begins, yet the README parameter list never names it. The fuller account of types, varargs and keyword only arguments is held here beside the README version, so both versions stand in the record.</p><pre>python3 main.py MODULE_PATH --num_tests 10 --string_length 10 --int_min -100 --int_max 100</pre></section><div class="div"></div><section class="panel" id="s3"><h2>When the Module Will Not Parse</h2><p>The random source is never seeded, so two runs over the same module produce different tests, and a failing case must be saved from its own run because rerunning will not reproduce it. The generated tests catch their own exceptions and merely print them, so the exit code of a generated file stays at nought even when a case has failed, and only a reader of the printout learns of the failure. A module which cannot be read or parsed ends the run at exit 1 and writes no output file. A readable module defining no functions of its own likewise ends the run at exit 1. The argument checks refuse a missing path, a test count of nought or below, a string length of nought or below, and an integer minimum above its maximum, each with exit 1.</p></section><div class="div"></div><section class="panel" id="s4"><h2>Addresses, Filed As Printed</h2><div class="callout"><h3>Clone Line Filed Under the Wrong Name</h3><p><code>git clone https://github.com/ShadowStrikeHQ/codeintel-fuzz-test-generator</code></p><p>The clone line as the README prints it points to ShadowStrikeHQ rather than to ShadowGuard-AI. It is shown here without quiet repair.</p></div><p>The licence position stands in two parts that are not forced to agree: the README closes with <span>Copyright (c) ShadowStrikeHQ</span>, while the repository LICENSE file carries the MIT License.</p><p>Repository note, marked as such: a requirements.txt file states that main.py uses only the standard library.</p></section>
-</main>
-<footer><p>Cartography Darkroom of the Aerial Photos. The horn of this room is a ruler of light: pairs are aligned, measured, and filed, and naming happens once, on the furniture.</p></footer>
+<figure>
+  <img src="assets/intro-banner.png" alt="The tensile machine's jaws close up with the yarn sample stretched between them and its thread beginning to fray, the technician's hand at the frame edge and the bobbin row soft behind">
+  <figcaption>One specimen drawn up between the jaws, pulled until its thread begins to give.</figcaption>
+</figure>
+
+<div class="facts">
+  <div class="fact"><b>Read, never run</b>The target module is parsed from its syntax tree only; it is never imported or executed</div>
+  <div class="fact"><b>Top level only</b>Only functions defined at the module top level receive tests; methods and nested functions do not</div>
+  <div class="fact"><b>Unseeded random</b>The random module is never seeded, so two runs differ and a failing case has to be saved from its own run</div>
+  <div class="fact"><b>Printed verdicts</b>Generated tests print their outcomes inside try blocks, so a generated file exits 0 even when a case has failed</div>
+</div>
+<section>
+  <h2>Usage</h2>
+  <pre>python3 main.py MODULE_PATH [--num_tests N] [--string_length N] [--int_min N] [--int_max N] [--output_file FILE]</pre>
+  <p>Parameter values are drawn from the annotation on each parameter: int, float, str, and bool are honoured, and every other annotation, list and dict included, falls back to str, so a generated call can pass a string where the author expected a container. A target that cannot be read or parsed, or that defines no functions of its own, fails the run at exit 1 and writes nothing. The repo also carries a SECURITY.md beside the code.</p>
+<table>
+    <tr><th>Option</th><th>What it does</th></tr>
+    <tr><td><code>module_path</code></td><td>The module to generate tests for. Required. The README parameter list omits it; the code requires it.</td></tr>
+    <tr><td><code>--num_tests</code></td><td>Generated tests per function. Default 10.</td></tr>
+    <tr><td><code>--string_length</code></td><td>Length of generated string values. Default 10.</td></tr>
+    <tr><td><code>--int_min</code> / <code>--int_max</code></td><td>The integer range drawn from. Defaults -100 and 100.</td></tr>
+    <tr><td><code>--output_file</code></td><td>Send the generated tests to a file instead of stdout.</td></tr>
+  </table>
+</section>
+<section class="hold">
+  <h2>What a quiet run means</h2>
+  <ul>
+    <li>A generated test file that runs clean has printed its outcomes, not proven them: whoever runs it must read the printout to know whether a case failed.</li>
+    <li>Because the random draws are never seeded, a failure found once cannot be reproduced by simply running the generator again.</li>
+    <li>Functions below the top level, methods and nested functions, are never given tests at all.</li>
+  </ul>
+</section>
+<section>
+  <h2>Requirements</h2>
+  <p>Python, standard library only. The requirements file is a comment saying so, and noting that the bandit, flake8, pylint, and pyre-check entries that stood there before were never imported or run by this tool.</p>
+</section>
+<footer>
+<p>The README of codeintel-fuzz-test-generator names the stale ShadowStrikeHQ org in its clone URL and closes with a copyright line naming the same org; the repository carries a separate LICENSE file headed MIT License. Both are preserved exactly as printed. Site type is set in Kelly Slab and Telex, self-hosted under the SIL Open Font License.</p>
+</footer>
+</div>
 </body>
 </html>

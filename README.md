@@ -6,6 +6,8 @@ Specimen label treatment: the title is set in Be Vietnam Pro on a lab white plat
 
 ![One wooden bobbin wound with cream yarn resting on its side on a weathered bench, loose thread trailing from it and mill brick soft behind](logo.png)
 
+![The technician at the long bench feeding a yarn sample up into the tensile machine's jaws, the bobbin row standing along the bench beside her, the machine's round gauge turned away to its plain blank back and the brick mill wall and floor running on behind](banner.png)
+
 ![Darkroom in three depths: a paired photograph slides a little into alignment on the light table, a stereoscope tips a little toward true and rests, and the light table glow breathes faintly at its edge, while the pinned flight strips stay still](scene.svg)
 
 
